@@ -117,7 +117,9 @@
             <td th:text="${user.getEmail()}"></td>
             <td>
                 <a type="button" th:href="@{/users/{id}/edit(id=${user.getId()})}" class="btn btn-light" th:class="${rowStat.count % 2 == 0 ? 'table-light' : ''}">Изменить</a>
-                <a type="button" th:href="@{/users/delete(id=${user.getId()})}" class="btn btn-light" th:class="${rowStat.count % 2 == 0 ? 'table-light' : ''}">Удалить</a>
+                <form th:method="DELETE" th:action="@{/users/delete(id=${user.getId()})}">
+                    <input type="submit" value="Delete"/>
+                </form>
             </td>
         </tr>
         </tbody>

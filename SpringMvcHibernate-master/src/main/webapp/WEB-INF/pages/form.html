@@ -60,14 +60,14 @@
 </head>
 
 <body>
-<h1>Форма для заполнения</h1>
+<h1>Form</h1>
 <form th:action="@{/users}" th:object="${user}" method="post">
     <input type="hidden" th:field="*{id}"/>
-    <label for="firstName">Имя:</label>
+    <label for="firstName">Name:</label>
     <input type="text" id="firstName" th:field="*{firstName}"/>
     <div class="error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
 
-    <label for="lastName">Фамилия:</label>
+    <label for="lastName">Surname:</label>
     <input type="text" id="lastName" th:field="*{lastName}"/>
     <div class="error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
 
@@ -75,9 +75,8 @@
     <input type="email" id="email" th:field="*{email}"/>
     <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
 
-    <button type="submit">Сохранить</button>
+    <button type="submit">Save</button>
 </form>
 </body>
 
 </html>
-

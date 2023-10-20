@@ -1,9 +1,11 @@
 package web.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import web.model.User;
 import web.service.UserService;
@@ -21,7 +23,7 @@ public class UserController {
 	}
 
 	@GetMapping({"", "/", "us"})
-	public String showAllUsers(Model model, @ModelAttribute("flashMessage") String flashAttribute) {
+	public String showAllUsers(Model model) {
 		model.addAttribute("users", userService.getAllUsers());
 		return "us";
 	}
@@ -32,17 +34,9 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}/edit")
-	public String edidtUserForm(@PathVariable(value = "id", required = true) long id, Model model,
-								RedirectAttributes attributes) {
-		User user = userService.readUser(id);
-
-		if (null == user) {
-			attributes.addFlashAttribute("flashMessage", "Ошибка!");
-			return "redirect:/users";
-		}
-
+	public String editUser(Model model, @PathVariable("id") int id) {
 		model.addAttribute("user", userService.readUser(id));
-		return "form";
+		return "edit";
 	}
 
 	@PostMapping()
@@ -52,21 +46,43 @@ public class UserController {
 			return "form";
 		}
 
-		userService.createaUser(user);
+		if (user.getId() != 0) {
+			User existingUser = userService.readUser(user.getId());
+			if (existingUser != null) {
+				userService.updateUser(user);
+			} else {
+				userService.saveUser(user);
+			}
+		} else {
+			userService.saveUser(user);
+		}
+
 		attributes.addFlashAttribute("flashMessage",
-				"Пользователь " + user.getFirstName() + "  создан");
+				"Пользователь " + user.getFirstName() + " создан");
 		return "redirect:/users";
 	}
 
-	@GetMapping("/delete")
-	public String deleteUser(@RequestParam(value = "id", required = true, defaultValue = "") long id,
-							 RedirectAttributes attributes) {
-		User user = userService.deleteUser(id);
+	@PatchMapping("/{id}")
+	public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "edit";
+		}
+		userService.updateUser(user);
+		return "redirect:/";
+	}
 
-		attributes.addFlashAttribute("flashMessage", (null == user) ?
-				"Пользователь не существует" :
-				"Пользователь " + user.getFirstName() + " успешно удален");
+
+	@DeleteMapping("/delete")
+	public String deleteUser(@RequestParam("id") int id) {
+		User user = userService.readUser(id);
+		if (user == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + id + " не найден");
+		}
+
+		userService.deleteUser(id);
 
 		return "redirect:/users";
 	}
 }
+
+

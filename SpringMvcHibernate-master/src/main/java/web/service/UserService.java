@@ -8,9 +8,11 @@ public interface UserService {
 
     List<User> getAllUsers();
 
-    User readUser(long id);
+    User readUser(int id);
 
-    User deleteUser(long parseUnsignedInt);
 
-    void createaUser(User user);
+    void deleteUser(int id);
+
+    User saveUser(User user);
+    User updateUser(User user);
 }

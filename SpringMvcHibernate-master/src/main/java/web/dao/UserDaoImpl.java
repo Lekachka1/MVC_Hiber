@@ -19,30 +19,29 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void createUser(User user) {
+    public User saveUser(User user) {
         entityManager.persist(user);
-        entityManager.flush();
+        return user;
     }
 
     @Override
-    public void updateUser(User user) {
-        entityManager.merge(user);
-        entityManager.flush();
+    public User updateUser(User user) {
+        return entityManager.merge(user);
     }
 
     @Override
-    public User readUser(long id) {
+    public User readUser(int id) {
         return entityManager.find(User.class, id);
     }
 
     @Override
-    public User deleteUser(long id) throws NullPointerException {
+    public User deleteUser(int id) throws NullPointerException {
         User user = readUser(id);
         if (null == user) {
             throw new NullPointerException("User not found");
         }
         entityManager.remove(user);
-        entityManager.flush();
         return user;
     }
+
 }

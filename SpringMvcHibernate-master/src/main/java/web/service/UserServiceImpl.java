@@ -8,7 +8,6 @@ import web.model.User;
 import java.util.List;
 
 @Service
-@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
@@ -23,35 +22,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createaUser(User user) {
-        if (0 == user.getId()) {
-            createUser(user);
-        } else {
-            updateUser(user);
-        }
-    }
-
-    private void createUser(User user) {
-        userDao.createUser(user);
-    }
-
-    private void updateUser(User user) {
-        userDao.updateUser(user);
-    }
-
-    @Override
-    public User readUser(long id) {
+    public User readUser(int id) {
         return userDao.readUser(id);
     }
 
+
     @Override
-    public User deleteUser(long id) {
-        User user = null;
-        try {
-            user = userDao.deleteUser(id);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
+    @Transactional
+    public void deleteUser(int id) {
+        User user = userDao.deleteUser(id);
+
+    }
+    @Override
+    @Transactional
+    public User saveUser(User user) {
+        return userDao.saveUser(user);
+    }
+
+    @Override
+    @Transactional
+    public User updateUser(User user) {
+        User existingUser = readUser(user.getId());
+        if(existingUser != null) {
+            return userDao.updateUser(user);
+        } else {
+            return null;
         }
-        return user;
     }
 }
