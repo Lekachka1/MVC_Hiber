@@ -1,5 +1,6 @@
 package web.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +18,7 @@ import javax.validation.Valid;
 public class UserController {
 
 	private final UserService userService;
-
+@Autowired
 	public UserController(UserService userService) {
 		this.userService = userService;
 	}
@@ -27,60 +28,40 @@ public class UserController {
 		model.addAttribute("users", userService.getAllUsers());
 		return "us";
 	}
-
 	@GetMapping(value = "/new")
 	public String addUserForm(@ModelAttribute("user") User user) {
 		return "form";
 	}
 
-	@GetMapping("/{id}/edit")
-	public String editUser(Model model, @PathVariable("id") int id) {
-		model.addAttribute("user", userService.readUser(id));
-		return "edit";
-	}
-
 	@PostMapping()
-	public String saveUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
+	public String addUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
 						   RedirectAttributes attributes) {
 		if (bindingResult.hasErrors()) {
 			return "form";
 		}
-
-		if (user.getId() != 0) {
-			User existingUser = userService.readUser(user.getId());
-			if (existingUser != null) {
-				userService.updateUser(user);
-			} else {
-				userService.saveUser(user);
-			}
-		} else {
-			userService.saveUser(user);
-		}
-
-		attributes.addFlashAttribute("flashMessage",
-				"Пользователь " + user.getFirstName() + " создан");
+		userService.addUser(user);
 		return "redirect:/users";
 	}
-
+	@GetMapping("/{id}/edit")
+	public String editUser(Model model, @PathVariable("id") int id) {
+		model.addAttribute("user", userService.getUser(id));
+		return "edit";
+	}
 	@PatchMapping("/{id}")
 	public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return "edit";
 		}
-		userService.updateUser(user);
+		userService.editUser(user);
 		return "redirect:/";
 	}
-
-
 	@DeleteMapping("/delete")
 	public String deleteUser(@RequestParam("id") int id) {
-		User user = userService.readUser(id);
+		User user = userService.getUser(id);
 		if (user == null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + id + " не найден");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + id + " not found");
 		}
-
 		userService.deleteUser(id);
-
 		return "redirect:/users";
 	}
 }
