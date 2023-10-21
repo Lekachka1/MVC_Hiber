@@ -24,18 +24,18 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	@GetMapping({"", "/"})
+	@GetMapping( "/")
 	public String showAllUsers(Model model) {
 		model.addAttribute("users", userService.getAllUsers());
 		return "user";
 	}
 
-	@GetMapping("users/new")
+	@GetMapping("/new")
 	public String addUserForm(@ModelAttribute("user") User user) {
 		return "form";
 	}
 
-	@PostMapping("users")
+	@PostMapping("/")
 	public String addUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
 						  RedirectAttributes attributes) {
 		if (bindingResult.hasErrors()) {
@@ -45,7 +45,7 @@ public class UserController {
 		return "redirect:/";
 	}
 
-	@GetMapping("/users/{id}/edit")
+	@GetMapping("/{id}/edit")
 	public String editUser(Model model, @PathVariable("id") int id) {
 		model.addAttribute("user", userService.getUser(id));
 		return "edit";
@@ -60,7 +60,7 @@ public class UserController {
 		return "redirect:/";
 	}
 
-	@DeleteMapping("/users/delete")
+	@DeleteMapping("/delete")
 	public String deleteUser(@RequestParam("id") int id) {
 		User user = userService.getUser(id);
 		if (user == null) {
