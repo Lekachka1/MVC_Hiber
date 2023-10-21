@@ -14,39 +14,43 @@ import web.service.UserService;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping({"/", "/users"})
+@RequestMapping("/")
 public class UserController {
 
 	private final UserService userService;
-@Autowired
+
+	@Autowired
 	public UserController(UserService userService) {
 		this.userService = userService;
 	}
 
-	@GetMapping({"", "/", "us"})
+	@GetMapping({"", "/"})
 	public String showAllUsers(Model model) {
 		model.addAttribute("users", userService.getAllUsers());
-		return "us";
+		return "user";
 	}
-	@GetMapping(value = "/new")
+
+	@GetMapping("users/new")
 	public String addUserForm(@ModelAttribute("user") User user) {
 		return "form";
 	}
 
-	@PostMapping()
+	@PostMapping("users")
 	public String addUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
-						   RedirectAttributes attributes) {
+						  RedirectAttributes attributes) {
 		if (bindingResult.hasErrors()) {
 			return "form";
 		}
 		userService.addUser(user);
-		return "redirect:/users";
+		return "redirect:/";
 	}
-	@GetMapping("/{id}/edit")
+
+	@GetMapping("/users/{id}/edit")
 	public String editUser(Model model, @PathVariable("id") int id) {
 		model.addAttribute("user", userService.getUser(id));
 		return "edit";
 	}
+
 	@PatchMapping("/{id}")
 	public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -55,15 +59,17 @@ public class UserController {
 		userService.editUser(user);
 		return "redirect:/";
 	}
-	@DeleteMapping("/delete")
+
+	@DeleteMapping("/users/delete")
 	public String deleteUser(@RequestParam("id") int id) {
 		User user = userService.getUser(id);
 		if (user == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + id + " not found");
 		}
 		userService.deleteUser(id);
-		return "redirect:/users";
+		return "redirect:/";
 	}
 }
+
 
 
